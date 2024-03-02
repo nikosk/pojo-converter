@@ -1,7 +1,16 @@
 package server
 
-case class StaticRoutes(prefix: String = "")(implicit cc: castor.Context, log: cask.Logger)
-    extends cask.Routes {
+import scalatags.Text.all._
+import server.service.ConverterService
+import scala.util.Failure
+import scala.util.Try
+import scala.util.Success
+
+case class StaticRoutes(prefix: String = "")(implicit
+    cc: castor.Context,
+    log: cask.Logger
+) extends cask.Routes {
+
 
   @cask.staticResources(s"${prefix}/static/resources/")
   def staticResources() = { "static" }
@@ -12,6 +21,14 @@ case class StaticRoutes(prefix: String = "")(implicit cc: castor.Context, log: c
   @cask.get("/")
   def home() = {
     server.index()
+  }
+
+  @cask.postForm("/submit")
+  def submit(from: cask.FormValue, to: cask.FormValue) = {
+    Try(ConverterService.convert(from.value, to.value)) match {
+      case Success(res) => pre(res)
+      case Failure(e) => pre(e.getMessage)
+    }
   }
 
   initialize()
