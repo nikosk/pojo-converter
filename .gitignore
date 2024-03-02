@@ -1,0 +1,6 @@
+out/
+.bloop/
+.metals/
+.vscode/
+
+.DS_Store
