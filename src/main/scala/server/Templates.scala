@@ -17,6 +17,7 @@ def layout(headCnt: Seq[Modifier] = Nil, mainCnt: Seq[Modifier] = Nil) =
           name := "viewport",
           content := "width=device-width, initial-scale=1"
         ),
+        meta(name:="description", content:="A tool to create Converters for POJOs with Lombok builders"),
         favicons,
         script(
           src := "https://unpkg.com/htmx.org@1.9.10",

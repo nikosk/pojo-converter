@@ -1,0 +1,70 @@
+---
+- hosts: webserver
+  become: true
+  tasks:
+
+    - name: Create system app user
+      user:
+        name: app
+        system: yes
+        home: /opt/app
+        shell: /usr/sbin/nologin
+        create_home: yes
+   
+    - name: Install required packages
+      apt:
+        update_cache: yes
+        name:
+          - debian-keyring
+          - debian-archive-keyring
+          - apt-transport-https
+          - openjdk-21-jdk
+        state: present
+
+    - name: Add Cloudsmith repository
+      apt_key:
+        url: "https://dl.cloudsmith.io/public/caddy/stable/gpg.key"
+        state: present
+    - name: Add Caddy repository to sources list
+      apt_repository:
+        repo:
+          "deb https://dl.cloudsmith.io/public/caddy/stable/deb/debian
+          any-version main"
+        state: present
+        filename: caddy-stable
+    
+    - name: Install Caddy
+      apt:
+        update_cache: yes
+        name: caddy
+        state: present
+
+    - name: Deploy the Java application
+      copy:
+        src: ../out/assembly.dest/out.jar
+        dest: /opt/app/app.jar
+
+    - name: Create a systemd service for the Java application
+      template:
+        src: templates/app.service.j2
+        dest: /etc/systemd/system/app.service
+      notify: start app service
+
+    - name: Configure Caddy to act as a reverse proxy
+      template:
+        src: templates/Caddyfile.j2
+        dest: /etc/caddy/Caddyfile
+      notify: restart caddy
+
+  handlers:
+    - name: restart caddy
+      systemd:
+        name: caddy
+        state: restarted
+
+    - name: start app service
+      systemd:
+        name: app
+        state: restarted
+        enabled: yes
+
