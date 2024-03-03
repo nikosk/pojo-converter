@@ -26,7 +26,7 @@ case class StaticRoutes(prefix: String = "")(implicit
   @cask.postForm("/submit")
   def submit(from: cask.FormValue, to: cask.FormValue) = {
     Try(ConverterService.convert(from.value, to.value)) match {
-      case Success(res) => pre(res)
+      case Success(res) => pre(code(res))
       case Failure(e) => pre(e.getMessage)
     }
   }

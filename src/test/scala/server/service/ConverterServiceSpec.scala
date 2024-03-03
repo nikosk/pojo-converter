@@ -7,18 +7,24 @@ class ConverterServiceTest extends AnyFunSpec with Matchers {
 
   val javaClassSource1 = """
     public class User {
-        private Long id;
-        private String name;
-        private String email;
-    }
+        Long id;
+        String name;
+        String email;
+        List<Pojo> pojos;
+        SomePojo pojo;
+        String ignore;
+  }
     """
 
   val javaClassSource2 = """
       public class UserDTO {
           private Long id;
           private String name;
-          private String contactEmail;
-      }
+          private String email;
+          private List<PojoDto> pojos;
+          SomePojoDto pojo;
+          String ignore_;
+ }
       """
 
   def normalize(s: String): String = s.replaceAll("\\s+", " ").trim
@@ -31,7 +37,10 @@ class ConverterServiceTest extends AnyFunSpec with Matchers {
           fields = Seq(
             PojoField("id", "Long"),
             PojoField("name", "String"),
-            PojoField("email", "String")
+            PojoField("email", "String"),
+            PojoField("pojos", "List<Pojo>"),
+            PojoField("pojo", "SomePojo"),
+            PojoField("ignore", "String")
           )
         )
 
@@ -56,6 +65,13 @@ class ConverterServiceTest extends AnyFunSpec with Matchers {
           "UserDTO.builder()",
           ".id(user.getId())",
           ".name(user.getName())",
+          ".pojos(",
+          "user.getPojos()",
+          ".stream()",
+          ".map(PojoConverter::convertToPojoDto)",
+          "toList()",
+          ")",
+          ".pojo(SomePojoConverter.convertToSomePojoDto(pojo))",
           ".build()"
         )
 
