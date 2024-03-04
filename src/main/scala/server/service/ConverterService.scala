@@ -106,13 +106,13 @@ object ConverterService {
                 |.${to.name}(
                 |    ${paramName}.get${from.name.capitalize}()
                 |    .stream()
-                |    .map(${fromType}Converter::convertTo${toType})
+                |    .map(${fromType}Converter::mapTo${toType})
                 |    .toList()
                 |)
                 """.stripMargin.trim())
         } else None
       } else if (!from.isCollection && !to.isCollection) {
-        Some(s"\n.${to.name}(${from.dataType}Converter.convertTo${to.dataType}(${from.name}))")
+        Some(s"\n.${to.name}(${from.dataType}Converter.mapTo${to.dataType}(${from.name}))")
       } else {
         None
       }
