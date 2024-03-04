@@ -107,7 +107,7 @@ object ConverterService {
                 |    ${paramName}.get${from.name.capitalize}()
                 |    .stream()
                 |    .map(${fromType}Converter::convertTo${toType})
-                |    toList()
+                |    .toList()
                 |)
                 """.stripMargin.trim())
         } else None
